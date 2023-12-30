@@ -1,46 +1,58 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, Button } from 'react-native-web';
-import TrackPlayer from 'react-native-track-player'; // Assuming react-native-track-player
+import { Text, View, Button } from 'react-native';
+import Sound from 'react-native-sound';
 
 const Timer = () => {
   const [seconds, setSeconds] = useState(0);
   const [paused, setPaused] = useState(true);
-  const [intervalDuration, setIntervalDuration] = useState(5);
-  const [desiredTime, setDesiredTime] = useState(60); // Assuming a default desired time
+  const [intervalSound, setIntervalSound] = useState(null);
+  const [endingSound, setEndingSound] = useState(null);
 
-  // User-provided sound URLs (replace with actual URLs)
-  const startingSoundUrl = 'https://example.com/starting-sound.mp3';
-  const endingSoundUrl = 'https://example.com/ending-sound.mp3';
-  const intervalSoundUrl = 'https://example.com/interval-sound.mp3';
+  const intervalSoundURL = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'; // Replace with your chosen interval sound URL
+  const endingSoundURL = 'https://www.zapsplat.com/wp-content/uploads/2015/sound-effects-5460-old-fashioned-school-bell-ringing.mp3'; // Replace with your chosen ending sound URL
 
   useEffect(() => {
-    const loadSounds = async () => {
-      await TrackPlayer.add({ id: 'startingSound', url: startingSoundUrl });
-      await TrackPlayer.add({ id: 'endingSound', url: endingSoundUrl });
-      await TrackPlayer.add({ id: 'intervalSound', url: intervalSoundUrl });
+    // Load interval sound
+    const loadIntervalSound = async () => {
+      setIntervalSound(new Sound(intervalSoundURL, (error) => {
+        if (error) {
+          console.error('Error loading interval sound:', error);
+        }
+      }));
     };
-    loadSounds();
+    loadIntervalSound();
+
+    // Load ending sound
+    const loadEndingSound = async () => {
+      setEndingSound(new Sound(endingSoundURL, (error) => {
+        if (error) {
+          console.error('Error loading ending sound:', error);
+        }
+      }));
+    };
+    loadEndingSound();
+
+    return () => {
+      // Cleanup
+      if (intervalSound) intervalSound.release();
+      if (endingSound) endingSound.release();
+    };
   }, []);
 
   const handleTimer = () => {
     if (!paused) {
       setSeconds(seconds + 1);
-      if (seconds % intervalDuration === 0) {
-        TrackPlayer.play('intervalSound');
+      if (seconds % 5 === 0) { // Play interval sound every 5 seconds
+        intervalSound.play();
       }
-      if (seconds === desiredTime) {
-        TrackPlayer.play('endingSound');
-        setPaused(true); // Stop timer when desired time is reached
+      if (seconds === desiredTime) { // Replace desiredTime with your target duration
+        endingSound.play();
       }
     }
   };
 
   const handleStartPause = () => {
     setPaused(!paused);
-    if (!paused) {
-      setSeconds(0); // Reset timer on start
-      TrackPlayer.play('startingSound');
-    }
   };
 
   const handleReset = () => {
