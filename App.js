@@ -1,12 +1,13 @@
-import { StatusBar } from 'expo-status-bar';
+// import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native-web';
-import Timer from './components/timer1';
+// import Timer from './components/timer1';
 
 export default function App() {
   return (
     <View style={styles.container}>
-     <Timer />
-      <StatusBar style="auto" />
+      <h1>Hii</h1>
+     {/* <Timer />
+      <StatusBar style="auto" /> */}
     </View>
   );
 }
